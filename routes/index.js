@@ -2,17 +2,47 @@ const express = require('express')
 
 const router = express.Router()
 
+require('../models/access-log.model')
+
+
+const mongoose = require('mongoose')
+mongoose.connect('mongodb://localhost/access-logger')
+
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function() {
+    // we're connected!
+});
+
+var AccessLog = mongoose.model('AccessLog')
+
 
 router.get('/', (req, res) => {
-    res.send('index')
+    res.status(200).send(':)')
 })
 
 router.get('/log', (req, res) => {
-    res.status(200).send('get')
+    AccessLog.find({}).sort('-accessed').limit(2).exec((err, logs) => {
+        if(err) {
+            return res.status(422).send({
+                message: err
+            });
+        }
+        res.json(logs);
+    })
 })
 
 router.post('/log', (req, res) => {
-    res.status(201).send('post')
+    const accessLog = new AccessLog({ip: req.connection.remoteAddress});
+
+    accessLog.save((err, model) => {
+        if(err) {
+            res.status(500).send(err)
+        } else {
+            res.status(201).send(accessLog.toString())
+
+        }
+    })
 })
 
 module.exports = router

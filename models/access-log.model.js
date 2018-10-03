@@ -1,9 +1,11 @@
 var mongoose = require('mongoose');
 
-
 var accessLogSchema = new mongoose.Schema({
     ip: String,
-    accessed: Date
+    accessed: {
+        type: Date,
+        default: new Date()
+    }
 });
 
-var accessLog = mongoose.model('accessLog', accessLogSchema);
+var accessLog = mongoose.model('AccessLog', accessLogSchema);
