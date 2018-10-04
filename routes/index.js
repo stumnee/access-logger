@@ -11,7 +11,7 @@ mongoose.connect('mongodb://localhost/access-logger')
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
-    // we're connected!
+    console.log("db connected")
 });
 
 var AccessLog = mongoose.model('AccessLog')
@@ -33,7 +33,7 @@ router.get('/log', (req, res) => {
 })
 
 router.post('/log', (req, res) => {
-    const accessLog = new AccessLog({ip: req.connection.remoteAddress});
+    const accessLog = new AccessLog({ip: req.connection.remoteAddress, accessed: new Date()});
 
     accessLog.save((err, model) => {
         if(err) {
